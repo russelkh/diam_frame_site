@@ -1,25 +1,34 @@
 // =========================
-// PRODUCT PAGE LOAD (DYNAMIC)
+// PRODUCT PAGE LOAD
 // =========================
 if (window.location.pathname.includes("product.html")) {
   const params = new URLSearchParams(window.location.search);
 
-  const name = params.get("name");
-  const price = params.get("price");
-  const img = params.get("img");
-
-  document.getElementById("product-name").innerText = name;
-  document.getElementById("product-price").innerText = "₹" + price;
-  document.getElementById("product-img").src = img;
+  document.getElementById("product-name").innerText = params.get("name");
+  document.getElementById("product-price").innerText = "₹" + params.get("price");
+  document.getElementById("product-img").src = params.get("img");
 }
 
 // =========================
-// GO TO PRODUCT PAGE
+// NAVIGATION
 // =========================
 function goToProduct(name, price, img) {
-  const url = `product.html?name=${encodeURIComponent(name)}&price=${price}&img=${encodeURIComponent(img)}`;
-  window.location.href = url;
+  window.location.href =
+    `product.html?name=${encodeURIComponent(name)}&price=${price}&img=${encodeURIComponent(img)}`;
 }
+
+// =========================
+// CART COUNT
+// =========================
+function updateCartCount() {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  let count = cart.reduce((sum, item) => sum + item.qty, 0);
+
+  let badge = document.querySelector(".cart-count");
+  if (badge) badge.innerText = count;
+}
+
+updateCartCount();
 
 // =========================
 // ADD TO CART
@@ -35,7 +44,6 @@ function addToCart() {
 
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  // prevent duplicate → update qty instead
   let existing = cart.find(p => p.name === product.name);
 
   if (existing) {
@@ -47,7 +55,7 @@ function addToCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCartCount();
 
-  alert("Added to cart!");
+  showToast("Added to cart");
 }
 
 // =========================
@@ -59,28 +67,21 @@ function buyNow() {
 }
 
 // =========================
-// UPDATE CART COUNT
+// RENDER CART (🔥 KEY FUNCTION)
 // =========================
-function updateCartCount() {
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  let count = cart.reduce((sum, item) => sum + item.qty, 0);
-
-  let badge = document.querySelector(".cart-count");
-  if (badge) badge.innerText = count;
-}
-
-updateCartCount();
-
-// =========================
-// LOAD CART PAGE
-// =========================
-if (document.getElementById("cart-items")) {
+function renderCart() {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
   let container = document.getElementById("cart-items");
   let total = 0;
 
+  if (!container) return;
+
+  container.innerHTML = "";
+
   if (cart.length === 0) {
     container.innerHTML = "<p>Your cart is empty.</p>";
+    document.getElementById("total").innerText = 0;
+    return;
   }
 
   cart.forEach((item, index) => {
@@ -106,18 +107,22 @@ if (document.getElementById("cart-items")) {
   document.getElementById("total").innerText = total;
 }
 
+// run on load
+renderCart();
+
 // =========================
-// UPDATE QUANTITY (NO RELOAD)
+// UPDATE QTY (NO RELOAD 🔥)
 // =========================
 function updateQty(index, change) {
   let cart = JSON.parse(localStorage.getItem("cart"));
 
   cart[index].qty += change;
-
   if (cart[index].qty < 1) cart[index].qty = 1;
 
   localStorage.setItem("cart", JSON.stringify(cart));
-  location.reload(); // simple for now
+
+  renderCart();        // smooth update
+  updateCartCount();   // update navbar
 }
 
 // =========================
@@ -125,11 +130,12 @@ function updateQty(index, change) {
 // =========================
 function clearCart() {
   localStorage.removeItem("cart");
-  location.reload();
+  renderCart();
+  updateCartCount();
 }
 
 // =========================
-// PLACE ORDER (WHATSAPP READY)
+// PLACE ORDER (WHATSAPP)
 // =========================
 function placeOrder() {
   let name = document.getElementById("name").value;
@@ -168,10 +174,25 @@ ${address}, ${city} - ${pincode}`;
 }
 
 // =========================
-// SCROLL TO PRODUCTS
+// SCROLL
 // =========================
 function scrollToProducts() {
   document.getElementById("products").scrollIntoView({
     behavior: "smooth"
   });
+}
+
+// =========================
+// TOAST (nice UX 🔥)
+// =========================
+function showToast(msg) {
+  let toast = document.createElement("div");
+  toast.innerText = msg;
+  toast.className = "toast";
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 2000);
 }

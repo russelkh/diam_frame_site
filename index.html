@@ -27,44 +27,77 @@
   <div class="hero-content">
     <h1>Frame Your Moments. Forever.</h1>
     <p>Premium handcrafted frames designed for memories that matter.</p>
-    <button class="hero-btn" onclick="scrollToProducts()">Explore Collection</button>
+    <button class="hero-btn" onclick="scrollToProducts()">
+      Explore Collection <span class="arrow">→</span>
+    </button>
   </div>
 </section>
 
 <section class="products" id="products">
 
-  <div class="card" onclick="goToProduct('Black Walnut Frame',999,'frame1.jpeg')">
-    <img src="frame1.jpeg">
-    <h3>Black Walnut Frame</h3>
-    <p>₹999</p>
-  </div>
+  <div class="scroll-row">
 
-  <div class="card" onclick="goToProduct('Gold Wedding Frame',1499,'https://picsum.photos/300?2')">
-    <img src="https://picsum.photos/300?2">
-    <h3>Gold Wedding Frame</h3>
-    <p>₹1499</p>
-  </div>
+    <div class="card" onclick="goToProduct('Black Walnut Frame',999,'frame1.jpeg')">
+      <img src="frame1.jpeg">
+      <h3>Black Walnut Frame</h3>
+      <p>₹999</p>
+    </div>
 
-  <div class="card" onclick="goToProduct('Acrylic Frame',1299,'https://picsum.photos/300?3')">
-    <img src="https://picsum.photos/300?3">
-    <h3>Acrylic Frame</h3>
-    <p>₹1299</p>
+    <div class="card" onclick="goToProduct('Gold Frame',1499,'https://picsum.photos/300?2')">
+      <img src="https://picsum.photos/300?2">
+      <h3>Gold Frame</h3>
+      <p>₹1499</p>
+    </div>
+
+    <div class="card" onclick="goToProduct('Minimal Frame',899,'https://picsum.photos/300?3')">
+      <img src="https://picsum.photos/300?3">
+      <h3>Minimal Frame</h3>
+      <p>₹899</p>
+    </div>
+
+    <div class="card" onclick="goToProduct('Vintage Frame',1799,'https://picsum.photos/300?4')">
+      <img src="https://picsum.photos/300?4">
+      <h3>Vintage Frame</h3>
+      <p>₹1799</p>
+    </div>
+
+    <div class="card" onclick="goToProduct('Acrylic Frame',1299,'https://picsum.photos/300?5')">
+      <img src="https://picsum.photos/300?5">
+      <h3>Acrylic Frame</h3>
+      <p>₹1299</p>
+    </div>
+
+    <div class="card" onclick="goToProduct('Acrylic Frame',1299,'https://picsum.photos/300?5')">
+      <img src="https://picsum.photos/300?5">
+      <h3>Acrylic Frame</h3>
+      <p>₹1299</p>
+    </div>
+
+    <div class="card" onclick="goToProduct('Acrylic Frame',1299,'https://picsum.photos/300?5')">
+      <img src="https://picsum.photos/300?5">
+      <h3>Acrylic Frame</h3>
+      <p>₹1299</p>
+    </div>
+
   </div>
 
 </section>
 
 <section class="how">
-  <h2>How It Works</h2>
+  <h2 class="section-title">How It Works</h2>
+
   <div class="how-grid">
-    <div>
+    <div class="how-card">
       <h3>Choose</h3>
       <p>Pick your perfect frame</p>
     </div>
-    <div>
+
+    <div class="how-card">
       <h3>Customize</h3>
       <p>Select size & style</p>
     </div>
-    <div>
+
+    <div class="how-card">
       <h3>Delivered</h3>
       <p>Fast & safe delivery</p>
     </div>
