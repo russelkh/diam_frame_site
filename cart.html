@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cart</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+  <div class="logo">FrameLux</div>
+</header>
+
+<section class="cart">
+
+<h2>Your Cart</h2>
+
+<div id="cart-items" class="cart-grid"></div>
+
+<div class="summary">
+  <p>Delivery: ₹50</p>
+  <h3>Total: ₹<span id="total">0</span></h3>
+</div>
+
+<h2>Customer Details</h2>
+
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Phone">
+<textarea id="address" placeholder="Address"></textarea>
+<input id="city" placeholder="City">
+<input id="pincode" placeholder="Pincode">
+
+<button onclick="placeOrder()" class="btn">Place Order</button>
+
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
