@@ -1,39 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cart</title>
+
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header class="navbar">
-  <div class="logo">FrameLux</div>
+  <a href="index.html" class="logo">
+    <img src="daim logo.PNG">
+  </a>
+
+  <nav>
+    <a href="cart.html" class="cart-link">
+      🛒 Cart <span class="cart-count">0</span>
+    </a>
+  </nav>
 </header>
 
 <section class="cart">
 
-<h2>Your Cart</h2>
+  <h2>Your Cart</h2>
 
-<div id="cart-items" class="cart-grid"></div>
+  <div id="cart-items" class="cart-items"></div>
 
-<div class="summary">
-  <p>Delivery: ₹50</p>
-  <h3>Total: ₹<span id="total">0</span></h3>
-</div>
+  <div class="summary">
+    <p>Delivery: ₹50</p>
+    <h3>Total: ₹<span id="total">0</span></h3>
+  </div>
 
-<h2>Customer Details</h2>
+  <button onclick="clearCart()" class="btn-outline">Clear Cart</button>
 
-<input id="name" placeholder="Name">
-<input id="phone" placeholder="Phone">
-<textarea id="address" placeholder="Address"></textarea>
-<input id="city" placeholder="City">
-<input id="pincode" placeholder="Pincode">
+  <h2>Customer Details</h2>
 
-<button onclick="placeOrder()" class="btn">Place Order</button>
+  <input id="name" placeholder="Name">
+  <input id="phone" placeholder="Phone">
+  <textarea id="address" placeholder="Address"></textarea>
+  <input id="city" placeholder="City">
+  <input id="pincode" placeholder="Pincode">
+
+  <button onclick="placeOrder()" class="btn">Place Order</button>
 
 </section>
+
+<footer class="footer">
+  <p>Contact: +91 9876543210</p>
+</footer>
 
 <script src="script.js"></script>
 </body>
