@@ -348,3 +348,11 @@ body {
 .card {
   min-width: 240px;
 }
+/* SNAP EFFECT */
+.scroll-row {
+  scroll-snap-type: x mandatory;
+}
+
+.card {
+  scroll-snap-align: start;
+}
