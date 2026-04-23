@@ -196,3 +196,32 @@ function showToast(msg) {
     toast.remove();
   }, 2000);
 }
+function autoScrollProducts() {
+  const row = document.querySelector(".scroll-row");
+  if (!row) return;
+
+  let scrollAmount = 0;
+
+  setInterval(() => {
+    if (window.innerWidth > 768) return; // only mobile
+
+    scrollAmount += 260; // width of card
+
+    if (scrollAmount >= row.scrollWidth - row.clientWidth) {
+      scrollAmount = 0; // loop back
+    }
+
+    row.scrollTo({
+      left: scrollAmount,
+      behavior: "smooth"
+    });
+
+  }, 2500); // speed (2.5 sec)
+}
+
+autoScrollProducts();
+const row = document.querySelector(".scroll-row");
+
+if (row) {
+  row.addEventListener("touchstart", () => clearInterval());
+}
