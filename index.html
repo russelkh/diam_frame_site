@@ -34,54 +34,12 @@
 </section>
 
 <section class="products" id="products">
-
-  <div class="scroll-row">
-
-    <div class="card" onclick="goToProduct('Black Walnut Frame',999,'frame1.jpeg')">
-      <img src="frame1.jpeg">
-      <h3>Black Walnut Frame</h3>
-      <p>₹999</p>
-    </div>
-
-    <div class="card" onclick="goToProduct('Gold Frame',1499,'https://picsum.photos/300?2')">
-      <img src="https://picsum.photos/300?2">
-      <h3>Gold Frame</h3>
-      <p>₹1499</p>
-    </div>
-
-    <div class="card" onclick="goToProduct('Minimal Frame',899,'https://picsum.photos/300?3')">
-      <img src="https://picsum.photos/300?3">
-      <h3>Minimal Frame</h3>
-      <p>₹899</p>
-    </div>
-
-    <div class="card" onclick="goToProduct('Vintage Frame',1799,'https://picsum.photos/300?4')">
-      <img src="https://picsum.photos/300?4">
-      <h3>Vintage Frame</h3>
-      <p>₹1799</p>
-    </div>
-
-    <div class="card" onclick="goToProduct('Acrylic Frame',1299,'https://picsum.photos/300?5')">
-      <img src="https://picsum.photos/300?5">
-      <h3>Acrylic Frame</h3>
-      <p>₹1299</p>
-    </div>
-
-    <div class="card" onclick="goToProduct('Acrylic Frame',1299,'https://picsum.photos/300?5')">
-      <img src="https://picsum.photos/300?5">
-      <h3>Acrylic Frame</h3>
-      <p>₹1299</p>
-    </div>
-
-    <div class="card" onclick="goToProduct('Acrylic Frame',1299,'https://picsum.photos/300?5')">
-      <img src="https://picsum.photos/300?5">
-      <h3>Acrylic Frame</h3>
-      <p>₹1299</p>
-    </div>
-
-  </div>
-
+  <div class="scroll-row" id="product-list"></div>
 </section>
+
+<p id="no-products" style="text-align:center; display:none;">
+  No products available right now 😔
+</p>
 
 <section class="how">
   <h2 class="section-title">How It Works</h2>
@@ -91,7 +49,6 @@
       <h3>Choose</h3>
       <p>Pick your perfect frame</p>
     </div>
-
     <div class="how-card">
       <h3>Customize</h3>
       <p>Select size & style</p>
