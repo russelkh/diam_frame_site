@@ -1,21 +1,77 @@
 // =========================
-// PRODUCT PAGE LOAD
+// API
 // =========================
-if (window.location.pathname.includes("product.html")) {
+const API_URL = "https://script.google.com/macros/s/AKfycbwVq3c-V2QVyN7vE6KdoQsNyD3kXR5ixjg_5lqdnR3K49lZFfzEHaiiboODrcZ549G8GQ/exec";
+
+// =========================
+// LOAD PRODUCTS (HOME PAGE)
+// =========================
+async function loadProducts() {
+  const res = await fetch(API_URL);
+  const products = await res.json();
+
+  console.log("Products:", products);
+
+  const container = document.getElementById("product-list");
+  const emptyText = document.getElementById("no-products");
+
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (products.length === 0) {
+    emptyText.style.display = "block";
+    return;
+  }
+
+  products.forEach(p => {
+    let img = p.image || "https://picsum.photos/300";
+
+    container.innerHTML += `
+      <div class="card" onclick="goToProduct(${p.id})">
+        <img src="${img}">
+        <h3>${p.name}</h3>
+        <p>₹${p.price}</p>
+      </div>
+    `;
+  });
+}
+
+loadProducts();
+
+// =========================
+// GO TO PRODUCT PAGE
+// =========================
+function goToProduct(id) {
+  window.location.href = `product.html?id=${id}`;
+}
+
+// =========================
+// LOAD PRODUCT PAGE
+// =========================
+async function loadProductPage() {
+  if (!window.location.pathname.includes("product.html")) return;
+
   const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-  document.getElementById("product-name").innerText = params.get("name");
-  document.getElementById("product-price").innerText = "₹" + params.get("price");
-  document.getElementById("product-img").src = params.get("img");
+  const res = await fetch(API_URL);
+  const products = await res.json();
+
+  const product = products.find(p => p.id == id);
+
+  if (!product) return;
+
+  let img = product.image || "https://picsum.photos/300";
+
+  document.getElementById("product-name").innerText = product.name;
+  document.getElementById("product-price").innerText = "₹" + product.price;
+  document.getElementById("product-img").src = img;
+
+  window.currentProduct = product;
 }
 
-// =========================
-// NAVIGATION
-// =========================
-function goToProduct(name, price, img) {
-  window.location.href =
-    `product.html?name=${encodeURIComponent(name)}&price=${price}&img=${encodeURIComponent(img)}`;
-}
+loadProductPage();
 
 // =========================
 // CART COUNT
@@ -34,20 +90,21 @@ updateCartCount();
 // ADD TO CART
 // =========================
 function addToCart() {
-  const params = new URLSearchParams(window.location.search);
+  const qty = parseInt(document.getElementById("qty").value);
 
   let product = {
-    name: params.get("name"),
-    price: parseInt(params.get("price")),
-    qty: parseInt(document.getElementById("qty").value)
+    id: currentProduct.id,
+    name: currentProduct.name,
+    price: currentProduct.price,
+    qty
   };
 
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  let existing = cart.find(p => p.name === product.name);
+  let existing = cart.find(p => p.id === product.id);
 
   if (existing) {
-    existing.qty += product.qty;
+    existing.qty += qty;
   } else {
     cart.push(product);
   }
@@ -67,7 +124,7 @@ function buyNow() {
 }
 
 // =========================
-// RENDER CART (🔥 KEY FUNCTION)
+// RENDER CART
 // =========================
 function renderCart() {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -107,11 +164,10 @@ function renderCart() {
   document.getElementById("total").innerText = total;
 }
 
-// run on load
 renderCart();
 
 // =========================
-// UPDATE QTY (NO RELOAD 🔥)
+// UPDATE QTY
 // =========================
 function updateQty(index, change) {
   let cart = JSON.parse(localStorage.getItem("cart"));
@@ -121,8 +177,8 @@ function updateQty(index, change) {
 
   localStorage.setItem("cart", JSON.stringify(cart));
 
-  renderCart();        // smooth update
-  updateCartCount();   // update navbar
+  renderCart();
+  updateCartCount();
 }
 
 // =========================
@@ -135,9 +191,9 @@ function clearCart() {
 }
 
 // =========================
-// PLACE ORDER (WHATSAPP)
+// PLACE ORDER (SHEET + WHATSAPP)
 // =========================
-function placeOrder() {
+async function placeOrder() {
   let name = document.getElementById("name").value;
   let phone = document.getElementById("phone").value;
   let address = document.getElementById("address").value;
@@ -146,31 +202,45 @@ function placeOrder() {
 
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  if (cart.length === 0) {
-    alert("Cart is empty!");
+  if (!name || !phone || cart.length === 0) {
+    showToast("Fill all details");
     return;
   }
 
-  let products = cart.map(p =>
-    `${p.name} (Qty: ${p.qty}) - ₹${p.price * p.qty}`
-  ).join("%0A");
+  let itemsText = cart.map(p =>
+    `${p.name} (Qty: ${p.qty})`
+  ).join(", ");
 
   let total = cart.reduce((sum, p) => sum + p.price * p.qty, 0) + 50;
 
+  // SEND TO GOOGLE SHEET
+  await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      name,
+      phone,
+      address: `${address}, ${city} - ${pincode}`,
+      items: itemsText,
+      total
+    })
+  });
+
+  // WHATSAPP
   let msg =
 `🖼️ New Frame Order
 Name: ${name}
 Phone: ${phone}
 
 Order:
-${products}
+${itemsText}
 
 Total: ₹${total}
 
 Address:
 ${address}, ${city} - ${pincode}`;
 
-  window.location.href = `https://wa.me/919366349344?text=${msg}`;
+  window.location.href =
+    `https://wa.me/919366349344?text=${encodeURIComponent(msg)}`;
 }
 
 // =========================
@@ -183,7 +253,7 @@ function scrollToProducts() {
 }
 
 // =========================
-// TOAST (nice UX 🔥)
+// TOAST
 // =========================
 function showToast(msg) {
   let toast = document.createElement("div");
@@ -196,32 +266,33 @@ function showToast(msg) {
     toast.remove();
   }, 2000);
 }
+
+// =========================
+// SMOOTH AUTO SCROLL (FIXED)
+// =========================
 function autoScrollProducts() {
   const row = document.querySelector(".scroll-row");
   if (!row) return;
 
-  let scrollAmount = 0;
+  let speed = 0.3;
+  let isPaused = false;
 
-  setInterval(() => {
-    if (window.innerWidth > 768) return; // only mobile
+  function scroll() {
+    if (window.innerWidth <= 768 && !isPaused) {
+      row.scrollLeft += speed;
 
-    scrollAmount += 260; // width of card
-
-    if (scrollAmount >= row.scrollWidth - row.clientWidth) {
-      scrollAmount = 0; // loop back
+      if (row.scrollLeft >= row.scrollWidth - row.clientWidth) {
+        row.scrollLeft = 0;
+      }
     }
 
-    row.scrollTo({
-      left: scrollAmount,
-      behavior: "smooth"
-    });
+    requestAnimationFrame(scroll);
+  }
 
-  }, 2500); // speed (2.5 sec)
+  row.addEventListener("touchstart", () => isPaused = true);
+  row.addEventListener("touchend", () => isPaused = false);
+
+  scroll();
 }
 
 autoScrollProducts();
-const row = document.querySelector(".scroll-row");
-
-if (row) {
-  row.addEventListener("touchstart", () => clearInterval());
-}
