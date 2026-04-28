@@ -1,415 +1,307 @@
 // =========================
-// API
+// API — replace with your deployed Apps Script URL
 // =========================
-const API_URL = "https://script.google.com/macros/s/AKfycbwVq3c-V2QVyN7vE6KdoQsNyD3kXR5ixjg_5lqdnR3K49lZFfzEHaiiboODrcZ549G8GQ/exec";
-
-// =========================
-// LOAD PRODUCTS (HOME PAGE)
-// =========================
-async function loadProducts() {
-  const container = document.getElementById("product-list");
-  const emptyText = document.getElementById("no-products");
-
-  if (!container) return;
-
-  // Show skeleton cards while loading
-  container.innerHTML = "";
-  for (let i = 0; i < 4; i++) {
-    container.innerHTML += `
-      <div class="card">
-        <div class="skeleton" style="width:100%;height:180px;border-radius:10px;"></div>
-        <div class="skeleton" style="width:70%;height:16px;margin:10px 0 6px;border-radius:6px;"></div>
-        <div class="skeleton" style="width:40%;height:14px;border-radius:6px;"></div>
-      </div>
-    `;
-  }
-
-  try {
-    const res = await fetch(API_URL);
-    const products = await res.json();
-
-    container.innerHTML = "";
-
-    if (products.length === 0) {
-      if (emptyText) emptyText.style.display = "block";
-      return;
-    }
-
-    products.forEach(p => {
-      let img = p.image || "https://picsum.photos/300";
-
-      container.innerHTML += `
-        <div class="card" onclick="goToProduct(${p.id})">
-          <img src="${img}" loading="lazy" onerror="this.src='https://picsum.photos/300'" alt="${p.name}">
-          <h3>${p.name}</h3>
-          <p>₹${p.price}</p>
-        </div>
-      `;
-    });
-
-  } catch (err) {
-    container.innerHTML = "";
-    if (emptyText) {
-      emptyText.innerText = "Couldn't load products. Please try again.";
-      emptyText.style.display = "block";
-    }
-  }
-}
-
-loadProducts();
-
-// =========================
-// GO TO PRODUCT PAGE
-// =========================
-function goToProduct(id) {
-  window.location.href = `product.html?id=${id}`;
-}
-
-// =========================
-// LOAD PRODUCT PAGE
-// =========================
-async function loadProductPage() {
-  if (!window.location.pathname.includes("product.html")) return;
-
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-
-  const imgEl = document.getElementById("product-img");
-
-  // Skeleton on image while loading
-  if (imgEl) imgEl.classList.add("loading");
-
-  try {
-    const res = await fetch(API_URL);
-    const products = await res.json();
-
-    const product = products.find(p => p.id == id);
-    if (!product) return;
-
-    let img = product.image || "https://picsum.photos/300";
-
-    document.getElementById("product-name").innerText = product.name;
-    document.getElementById("product-price").innerText = "₹" + product.price;
-
-    // Load image — remove skeleton once loaded
-    imgEl.onload = () => imgEl.classList.remove("loading");
-    imgEl.onerror = () => {
-      imgEl.src = "https://picsum.photos/300";
-      imgEl.classList.remove("loading");
-    };
-    imgEl.src = img;
-
-    // Stock badge
-    const badge = document.getElementById("stock-badge");
-    if (badge) {
-      if (product.stock > 10) {
-        badge.innerHTML = `<span class="stock-badge in-stock">✓ In Stock</span>`;
-      } else if (product.stock > 0) {
-        badge.innerHTML = `<span class="stock-badge low-stock">⚠ Only ${product.stock} left!</span>`;
-      } else {
-        badge.innerHTML = `<span class="stock-badge out-of-stock">✕ Out of Stock</span>`;
-      }
-    }
-
-    // Set max quantity to available stock
-    const qtyInput = document.getElementById("qty");
-    if (qtyInput) {
-      qtyInput.max = product.stock;
-      if (product.stock === 0) {
-        qtyInput.disabled = true;
-        document.querySelector(".btn").disabled = true;
-        document.querySelector(".btn-outline").disabled = true;
-        document.querySelector(".btn").style.opacity = "0.5";
-        document.querySelector(".btn-outline").style.opacity = "0.5";
-      }
-    }
-
-    // Clamp qty if user types beyond stock
-    if (qtyInput) {
-      qtyInput.addEventListener("input", () => {
-        let val = parseInt(qtyInput.value);
-        if (val > product.stock) {
-          qtyInput.value = product.stock;
-          showToast(`Only ${product.stock} in stock`);
-        }
-        if (val < 1 || isNaN(val)) qtyInput.value = 1;
-      });
-    }
-
-    window.currentProduct = product;
-
-  } catch (err) {
-    if (imgEl) imgEl.classList.remove("loading");
-    showToast("Couldn't load product.");
-  }
-}
-
-loadProductPage();
-
-// =========================
-// CART COUNT
-// =========================
-function updateCartCount() {
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  let count = cart.reduce((sum, item) => sum + item.qty, 0);
-  let badge = document.querySelector(".cart-count");
-  if (badge) badge.innerText = count;
-}
-
-updateCartCount();
-
-// =========================
-// ADD TO CART
-// =========================
-function addToCart() {
-  const qtyInput = document.getElementById("qty");
-  const qty = parseInt(qtyInput.value);
-
-  if (!window.currentProduct) return;
-
-  // Enforce stock limit
-  if (qty > window.currentProduct.stock) {
-    showToast(`Only ${window.currentProduct.stock} in stock!`);
-    qtyInput.value = window.currentProduct.stock;
-    return;
-  }
-
-  if (qty < 1) {
-    showToast("Quantity must be at least 1");
-    return;
-  }
-
-  let product = {
-    id: currentProduct.id,
-    name: currentProduct.name,
-    price: currentProduct.price,
-    stock: currentProduct.stock,
-    qty
-  };
-
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  let existing = cart.find(p => p.id === product.id);
-
-  if (existing) {
-    let newQty = existing.qty + qty;
-    if (newQty > product.stock) {
-      showToast(`Can't add more. Only ${product.stock} in stock!`);
-      existing.qty = product.stock;
-    } else {
-      existing.qty = newQty;
-    }
-  } else {
-    cart.push(product);
-  }
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-  updateCartCount();
-  showToast("Added to cart ✓");
-}
-
-// =========================
-// BUY NOW
-// =========================
-function buyNow() {
-  addToCart();
-  window.location.href = "cart.html";
-}
-
-// =========================
-// RENDER CART
-// =========================
-function renderCart() {
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  let container = document.getElementById("cart-items");
-  let total = 0;
-
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  if (cart.length === 0) {
-    container.innerHTML = `<p style="opacity:0.6; padding: 10px 0;">Your cart is empty.</p>`;
-    document.getElementById("total").innerText = 0;
-    return;
-  }
-
-  cart.forEach((item, index) => {
-    total += item.price * item.qty;
-
-    container.innerHTML += `
-      <div class="cart-item">
-        <div>
-          <p style="font-weight:600;">${item.name}</p>
-          <p style="color:#C8A96B;">₹${item.price} × ${item.qty} = ₹${item.price * item.qty}</p>
-        </div>
-        <div style="display:flex; align-items:center; gap:4px;">
-          <button class="qty-btn" onclick="updateQty(${index}, -1)">−</button>
-          <span style="min-width:24px; text-align:center;">${item.qty}</span>
-          <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
-        </div>
-      </div>
-    `;
-  });
-
-  total += 50;
-  document.getElementById("total").innerText = total;
-}
-
-renderCart();
-
-// =========================
-// UPDATE QTY — removes item if goes below 1
-// =========================
-function updateQty(index, change) {
-  let cart = JSON.parse(localStorage.getItem("cart"));
-
-  cart[index].qty += change;
-
-  if (cart[index].qty < 1) {
-    // Remove item from cart
-    let removedName = cart[index].name;
-    cart.splice(index, 1);
-    showToast(`${removedName} removed`);
-  } else {
-    // Enforce stock limit on + press
-    let item = cart[index];
-    if (item.stock && item.qty > item.stock) {
-      item.qty = item.stock;
-      showToast(`Only ${item.stock} in stock!`);
-    }
-  }
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
-  updateCartCount();
-}
-
-// =========================
-// CLEAR CART
-// =========================
-function clearCart() {
-  localStorage.removeItem("cart");
-  renderCart();
-  updateCartCount();
-}
-
-// =========================
-// PLACE ORDER (SHEET + WHATSAPP)
-// =========================
-async function placeOrder() {
-  let name = document.getElementById("name").value.trim();
-  let phone = document.getElementById("phone").value.trim();
-  let address = document.getElementById("address").value.trim();
-  let city = document.getElementById("city").value.trim();
-  let pincode = document.getElementById("pincode").value.trim();
-
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-  if (!name || !phone || !address || !city || !pincode) {
-    showToast("Please fill all details");
-    return;
-  }
-
-  if (cart.length === 0) {
-    showToast("Your cart is empty!");
-    return;
-  }
-
-  let itemsText = cart.map(p => `${p.name} (Qty: ${p.qty})`).join(", ");
-  let total = cart.reduce((sum, p) => sum + p.price * p.qty, 0) + 50;
-
-  // Send to Google Sheet
-  try {
-    await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        phone,
-        address: `${address}, ${city} - ${pincode}`,
-        items: itemsText,
-        total
-      })
-    });
-  } catch (e) {
-    // Still proceed to WhatsApp even if sheet fails
-  }
-
-  // WhatsApp message
-  let msg =
-`🖼️ *New Frame Order*
-👤 Name: ${name}
-📞 Phone: ${phone}
-
-🛒 *Order:*
-${cart.map(p => `• ${p.name} × ${p.qty} = ₹${p.price * p.qty}`).join("\n")}
-
-🚚 Delivery: ₹50
-💰 *Total: ₹${total}*
-
-📍 *Address:*
-${address}, ${city} - ${pincode}`;
-
-  // Clear cart after order
-  localStorage.removeItem("cart");
-  updateCartCount();
-
-  window.location.href = `https://wa.me/919366349344?text=${encodeURIComponent(msg)}`;
-}
-
-// =========================
-// SCROLL TO PRODUCTS
-// =========================
-function scrollToProducts() {
-  const el = document.getElementById("products");
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth" });
-  }
-}
+const API_URL = "https://script.google.com/macros/s/AKfycbwJzaCmRwlJE3h3vscx-5ACPl-e5cCKcU1D-y5u3Vza3ptVXpP_fvgRZ5--xLCYM73F/exec";
 
 // =========================
 // TOAST
 // =========================
 function showToast(msg) {
-  // Remove existing toasts
   document.querySelectorAll(".toast").forEach(t => t.remove());
-
-  let toast = document.createElement("div");
-  toast.innerText = msg;
-  toast.className = "toast";
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.remove(), 2500);
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.innerText = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
 }
 
 // =========================
-// AUTO SCROLL (mobile only)
+// HOME PAGE — load size cards
 // =========================
-function autoScrollProducts() {
-  const row = document.querySelector(".scroll-row");
-  if (!row) return;
+async function loadHomePage() {
+  const grid = document.getElementById("sizes-grid");
+  if (!grid) return;
 
-  // Only run on desktop (mobile uses grid)
-  if (window.innerWidth <= 768) return;
+  // Skeletons while loading
+  grid.innerHTML = [1,2,3,4].map(() => `
+    <div class="size-card">
+      <div class="skeleton" style="height:220px;"></div>
+      <div style="padding:20px; display:flex; flex-direction:column; gap:10px;">
+        <div class="skeleton" style="height:18px; width:50%; border-radius:6px;"></div>
+        <div class="skeleton" style="height:13px; width:75%; border-radius:6px;"></div>
+      </div>
+    </div>
+  `).join("");
 
-  let speed = 0.3;
-  let isPaused = false;
+  try {
+    const res = await fetch(`${API_URL}?action=sizes`);
+    const sizes = await res.json();
 
-  function scroll() {
-    if (!isPaused) {
-      row.scrollLeft += speed;
-      if (row.scrollLeft >= row.scrollWidth - row.clientWidth) {
-        row.scrollLeft = 0;
-      }
+    grid.innerHTML = "";
+
+    if (!sizes || sizes.length === 0) {
+      grid.innerHTML = `<div class="empty-state">No sizes available right now 😔</div>`;
+      return;
     }
-    requestAnimationFrame(scroll);
+
+    sizes.forEach(s => {
+      const img = s.image || `https://picsum.photos/seed/size${s.id}/600/400`;
+      grid.innerHTML += `
+        <div class="size-card" onclick="goToDesigns(${s.id}, '${encodeURIComponent(s.size_label)}')">
+          <div class="size-card-img-wrap">
+            <img
+              src="${img}"
+              loading="lazy"
+              alt="${s.size_label}"
+              onerror="this.src='https://picsum.photos/seed/size${s.id}/600/400'"
+            >
+          </div>
+          <div class="size-card-body">
+            <div class="size-card-info">
+              <h3>${s.size_label}</h3>
+              <p>${s.description || "Tap to see designs"}</p>
+            </div>
+            <div class="size-card-arrow">→</div>
+          </div>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    grid.innerHTML = `<div class="empty-state">Couldn't load sizes. Please try again.</div>`;
+  }
+}
+
+// =========================
+// GO TO DESIGNS PAGE
+// =========================
+function goToDesigns(sizeId, sizeLabel) {
+  window.location.href = `designs.html?size_id=${sizeId}&size=${sizeLabel}`;
+}
+
+// =========================
+// DESIGNS PAGE — load designs for chosen size
+// =========================
+async function loadDesignsPage() {
+  const grid = document.getElementById("designs-grid");
+  if (!grid) return;
+
+  const params    = new URLSearchParams(window.location.search);
+  const sizeId    = params.get("size_id");
+  const sizeLabel = decodeURIComponent(params.get("size") || "");
+
+  // Set page title & breadcrumb
+  document.title = `${sizeLabel} Designs – Diam Frames`;
+  const bcSize    = document.getElementById("bc-size");
+  const pageTitle = document.getElementById("page-title");
+  if (bcSize)    bcSize.innerText    = sizeLabel;
+  if (pageTitle) pageTitle.innerText = `${sizeLabel} Designs`;
+
+  // Skeletons
+  grid.innerHTML = [1,2,3,4].map(() => `
+    <div class="design-card">
+      <div class="skeleton" style="height:200px; border-radius:0;"></div>
+      <div style="padding:14px; display:flex; flex-direction:column; gap:8px;">
+        <div class="skeleton" style="height:14px; width:65%; border-radius:6px;"></div>
+        <div class="skeleton" style="height:14px; width:40%; border-radius:6px;"></div>
+      </div>
+    </div>
+  `).join("");
+
+  try {
+    const res     = await fetch(`${API_URL}?action=designs&size_id=${sizeId}`);
+    const designs = await res.json();
+
+    grid.innerHTML = "";
+
+    if (!designs || designs.length === 0) {
+      grid.innerHTML = `<div class="empty-state">No designs available for this size yet 😔</div>`;
+      return;
+    }
+
+    designs.forEach(d => {
+      const img        = d.image || `https://picsum.photos/seed/d${d.id}/600/400`;
+      const stockColor = d.stock <= 5 ? "#facc15" : "var(--muted)";
+      const stockText  = d.stock <= 5 ? `Only ${d.stock} left!` : "In Stock";
+
+      grid.innerHTML += `
+        <div class="design-card" onclick="goToProduct(
+          '${encodeURIComponent(d.design_name)}',
+          '${encodeURIComponent(img)}',
+          ${d.price},
+          '${encodeURIComponent(sizeLabel)}',
+          ${d.stock},
+          ${sizeId}
+        )">
+          <div class="design-card-img-wrap">
+            <img
+              src="${img}"
+              loading="lazy"
+              alt="${d.design_name}"
+              onerror="this.src='https://picsum.photos/seed/d${d.id}/600/400'"
+            >
+          </div>
+          <div class="design-card-body">
+            <p class="design-card-name">${d.design_name}</p>
+            <p class="design-card-price">₹${d.price}</p>
+            <p class="design-card-stock" style="color:${stockColor};">${stockText}</p>
+          </div>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    grid.innerHTML = `<div class="empty-state">Couldn't load designs. Please try again.</div>`;
+  }
+}
+
+// =========================
+// GO TO FINAL PRODUCT PAGE
+// =========================
+function goToProduct(designName, img, price, sizeLabel, stock, sizeId) {
+  const p = new URLSearchParams({
+    design: designName,
+    img,
+    price,
+    size:    sizeLabel,
+    stock,
+    size_id: sizeId
+  });
+  window.location.href = `product.html?${p.toString()}`;
+}
+
+// =========================
+// FINAL PRODUCT PAGE — fill in details
+// =========================
+function loadProductPage() {
+  const imgEl = document.getElementById("product-img");
+  if (!imgEl) return;
+
+  const params     = new URLSearchParams(window.location.search);
+  const designName = decodeURIComponent(params.get("design") || "");
+  const img        = decodeURIComponent(params.get("img")    || "");
+  const price      = params.get("price")   || "";
+  const sizeLabel  = decodeURIComponent(params.get("size")   || "");
+  const stock      = parseInt(params.get("stock") || "0");
+  const sizeId     = params.get("size_id") || "";
+
+  document.title = `${designName} – Diam Frames`;
+
+  document.getElementById("product-name").innerText  = designName;
+  document.getElementById("product-price").innerText = `₹${price}`;
+  document.getElementById("final-size").innerText    = sizeLabel;
+  document.getElementById("bc-design").innerText     = designName;
+
+  // Back link goes to designs page for this size
+  const bcBack = document.getElementById("bc-back");
+  if (bcBack) {
+    bcBack.innerText = sizeLabel;
+    bcBack.href = `designs.html?size_id=${sizeId}&size=${encodeURIComponent(sizeLabel)}`;
   }
 
-  row.addEventListener("mouseenter", () => isPaused = true);
-  row.addEventListener("mouseleave", () => isPaused = false);
-  row.addEventListener("touchstart", () => isPaused = true);
-  row.addEventListener("touchend", () => isPaused = false);
+  // Stock tag
+  const stockTag = document.getElementById("stock-tag");
+  if (stockTag) {
+    if (stock <= 5) {
+      stockTag.innerText = `Only ${stock} left!`;
+      stockTag.style.color = "#facc15";
+      stockTag.style.borderColor = "rgba(250,204,21,0.3)";
+    } else {
+      stockTag.innerText = "In Stock";
+    }
+  }
 
-  scroll();
+  // Image with skeleton fallback
+  imgEl.style.background = "var(--surface2)";
+  imgEl.onload  = () => imgEl.style.background = "none";
+  imgEl.onerror = () => { imgEl.src = "https://picsum.photos/600/400"; };
+  imgEl.src = img;
+
+  // Store for order
+  window.currentOrder = { designName, price, sizeLabel };
 }
 
-autoScrollProducts();
+// =========================
+// PLACE ORDER
+// =========================
+async function placeOrder() {
+  const nameEl  = document.getElementById("name");
+  const phoneEl = document.getElementById("phone");
+
+  const name    = nameEl.value.trim();
+  const phone   = phoneEl.value.trim();
+  const address = document.getElementById("address")?.value.trim() || "";
+  const city    = document.getElementById("city")?.value.trim()    || "";
+  const pincode = document.getElementById("pincode")?.value.trim() || "";
+
+  let valid = true;
+
+  // Validate name
+  const nameHint = document.getElementById("name-hint");
+  if (!name) {
+    nameEl.classList.add("error");
+    nameHint.classList.add("show");
+    valid = false;
+  } else {
+    nameEl.classList.remove("error");
+    nameHint.classList.remove("show");
+  }
+
+  // Validate phone — exactly 10 digits
+  const phoneHint = document.getElementById("phone-hint");
+  if (!/^\d{10}$/.test(phone)) {
+    phoneEl.classList.add("error");
+    phoneHint.classList.add("show");
+    valid = false;
+  } else {
+    phoneEl.classList.remove("error");
+    phoneHint.classList.remove("show");
+  }
+
+  if (!valid) return;
+
+  const { designName, price, sizeLabel } = window.currentOrder || {};
+  const addrLine = [address, city, pincode].filter(Boolean).join(", ");
+
+  // Save to Google Sheet (fire and forget)
+  try {
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        name, phone,
+        size:    sizeLabel,
+        design:  designName,
+        price,
+        address: addrLine
+      })
+    });
+  } catch (_) {}
+
+  // WhatsApp message
+  const msg =
+`🖼️ *New Frame Order — Diam Frames*
+
+👤 *Name:* ${name}
+📞 *Phone:* ${phone}
+
+🛍️ *Order:*
+• Size: ${sizeLabel}
+• Design: ${designName}
+• Price: ₹${price}
+${addrLine ? `\n📍 *Address:* ${addrLine}` : ""}`;
+
+  window.location.href = `https://wa.me/919366518356?text=${encodeURIComponent(msg)}`;
+}
+
+// =========================
+// ROUTE — run correct function per page
+// =========================
+const path = window.location.pathname;
+
+if (path.includes("designs.html")) {
+  loadDesignsPage();
+} else if (path.includes("product.html")) {
+  loadProductPage();
+} else {
+  loadHomePage();
+}

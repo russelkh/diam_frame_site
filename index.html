@@ -1,64 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FrameLux</title>
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diam Frames</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
 <header class="navbar">
   <a href="index.html" class="logo">
-    <img src="daim logo.PNG" alt="Logo">
+    <img src="daim logo.PNG" alt="Diam Frames">
   </a>
-  <nav>
-    <a href="cart.html" class="cart-link">
-      🛒 Cart <span class="cart-count">0</span>
-    </a>
-  </nav>
 </header>
 
 <section class="hero">
-  <div class="hero-content">
-    <h1>Frame Your Moments. Forever.</h1>
-    <p>Premium handcrafted frames designed for memories that matter.</p>
-    <button class="hero-btn" onclick="scrollToProducts()">
-      Explore Collection <span class="arrow">→</span>
-    </button>
-  </div>
+  <p class="hero-eyebrow">Handcrafted in Manipur
+  </p>
+  <h1>Frame Your Moments.<br><em>Forever.</em></h1>
+  <p>Premium frames crafted for memories that deserve to last a lifetime.</p>
+  <button class="hero-btn" onclick="document.getElementById('sizes').scrollIntoView({behavior:'smooth'})">
+    Explore Collection <span class="arrow">→</span>
+  </button>
 </section>
 
-<section class="products" id="products">
-  <h2 class="section-title">Our Collection</h2>
-  <div class="scroll-row" id="product-list"></div>
-  <p id="no-products" style="text-align:center; display:none;">
-    No products available right now 
-  </p>
+<section class="sizes-section" id="sizes">
+  <div class="section-header">
+    <h2>Choose Your Size</h2>
+    <p>Pick a size to explore available designs</p>
+    <div class="gold-line"></div>
+  </div>
+  <div class="sizes-grid" id="sizes-grid"></div>
 </section>
 
 <section class="how">
-  <h2 class="section-title">How It Works</h2>
+  <div class="section-header">
+    <h2>How It Works</h2>
+    <p>Three simple steps to your perfect frame</p>
+    <div class="gold-line"></div>
+  </div>
   <div class="how-grid">
     <div class="how-card">
-      <h3> Choose</h3>
-      <p>Pick your perfect frame</p>
+      <div class="how-icon">📐</div>
+      <h3>Pick Size</h3>
+      <p>Choose the frame size you need</p>
     </div>
     <div class="how-card">
-      <h3>Customize</h3>
-      <p>Select size & style</p>
+      <div class="how-icon">🎨</div>
+      <h3>Choose Design</h3>
+      <p>Browse designs for that size</p>
     </div>
     <div class="how-card">
+      <div class="how-icon">📲</div>
+      <h3>Order</h3>
+      <p>Place order instantly via WhatsApp</p>
+    </div>
+    <div class="how-card">
+      <div class="how-icon">🚚</div>
       <h3>Delivered</h3>
-      <p>Fast & safe delivery</p>
+      <p>Fast & safe to your door</p>
+    </div>
+  </div>
+</section>
+
+<section class="video-section">
+  <div class="section-header">
+    <h2>See Our Craft</h2>
+    <p>Watch how we bring your memories to life</p>
+    <div class="gold-line"></div>
+  </div>
+  <div class="video-wrapper">
+    <!-- To add your video, replace everything inside this div with:          -->
+    <!-- <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID"            -->
+    <!--   allowfullscreen allow="accelerometer; autoplay; encrypted-media">  -->
+    <!-- </iframe>                                                             -->
+    <div class="video-placeholder">
+      <div class="play-icon">▶</div>
+      <p>Video coming soon</p>
     </div>
   </div>
 </section>
 
 <footer class="footer">
-  <p>Contact: +91 9876543210</p>
+  <p>© 2025 Diam Frames &nbsp;·&nbsp; Contact: +91 9876543210</p>
 </footer>
 
 <script src="script.js"></script>

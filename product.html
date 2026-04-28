@@ -1,56 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product</title>
-<link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order – Diam Frames</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
 <header class="navbar">
   <a href="index.html" class="logo">
-    <img src="daim logo.PNG" alt="Logo">
+    <img src="daim logo.PNG" alt="Diam Frames">
   </a>
-  <nav>
-    <a href="cart.html" class="cart-link">
-      🛒 Cart <span class="cart-count">0</span>
-    </a>
-  </nav>
 </header>
 
-<section class="product-page">
+<section class="final-page">
 
   <!-- IMAGE -->
-  <div class="gallery">
-    <img id="product-img" class="main-img" alt="Product Image">
+  <div class="final-img-wrap">
+    <img id="product-img" class="final-img" alt="Design">
   </div>
 
-  <!-- DETAILS -->
-  <div class="details">
-    <h1 id="product-name"></h1>
-    <h2 id="product-price" style="color:#C8A96B; margin: 10px 0 8px;"></h2>
-    <div id="stock-badge"></div>
+  <!-- DETAILS + FORM -->
+  <div class="final-details">
 
-    <label style="margin-top:16px;">Size</label>
-    <select id="size">
-      <option>A4</option>
-      <option>A3</option>
-    </select>
+    <p class="final-eyebrow" id="final-size">Size</p>
+    <h1 id="product-name">Loading...</h1>
 
-    <label>Quantity</label>
-    <input type="number" id="qty" value="1" min="1">
+    <div class="final-meta">
+      <span class="final-price" id="product-price"></span>
+      <span class="final-tag" id="stock-tag"></span>
+    </div>
 
-    <button onclick="addToCart()" class="btn">🛒 Add to Cart</button>
-    <button onclick="buyNow()" class="btn-outline">Buy Now</button>
+    <div class="breadcrumb" style="justify-content:flex-start; margin-bottom: 0;">
+      <a href="index.html">Home</a>
+      <span>›</span>
+      <a href="#" id="bc-back">...</a>
+      <span>›</span>
+      <span id="bc-design">...</span>
+    </div>
+
+    <div class="final-divider"></div>
+
+    <span class="form-label-top">Your Details to Order</span>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label>Full Name *</label>
+        <input id="name" type="text" placeholder="Your name" autocomplete="name">
+        <span class="field-hint" id="name-hint">Name is required</span>
+      </div>
+      <div class="form-field">
+        <label>Mobile Number *</label>
+        <input id="phone" type="tel" placeholder="10-digit number" maxlength="10" autocomplete="tel">
+        <span class="field-hint" id="phone-hint">Enter a valid 10-digit number</span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field full">
+        <label>Address <span style="opacity:0.4; font-size:0.68rem;">(optional)</span></label>
+        <input id="address" type="text" placeholder="Street, area…">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label>City <span style="opacity:0.4; font-size:0.68rem;">(optional)</span></label>
+        <input id="city" type="text" placeholder="City">
+      </div>
+      <div class="form-field">
+        <label>Pincode <span style="opacity:0.4; font-size:0.68rem;">(optional)</span></label>
+        <input id="pincode" type="number" placeholder="Pincode">
+      </div>
+    </div>
+
+    <button class="btn-whatsapp" onclick="placeOrder()">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 1C7.716 1 1 7.716 1 16c0 2.628.674 5.147 1.953 7.37L1.05 30.292a.75.75 0 0 0 .916.916l6.992-1.888A14.953 14.953 0 0 0 16 31c8.284 0 15-6.716 15-15S24.284 1 16 1zm0 27.5a13.45 13.45 0 0 1-6.84-1.87.75.75 0 0 0-.567-.077l-5.3 1.432 1.456-5.24a.75.75 0 0 0-.083-.578A13.449 13.449 0 0 1 2.5 16C2.5 8.544 8.544 2.5 16 2.5S29.5 8.544 29.5 16 23.456 28.5 16 28.5zm7.73-9.77c-.386-.193-2.28-1.124-2.633-1.252-.354-.128-.611-.193-.869.193-.257.386-.997 1.252-1.222 1.509-.225.258-.45.29-.836.097-.386-.193-1.63-.601-3.105-1.916-1.147-1.023-1.922-2.287-2.147-2.673-.225-.386-.024-.594.169-.787.174-.173.386-.45.579-.675.193-.226.257-.387.386-.645.128-.257.064-.483-.032-.675-.097-.193-.869-2.093-1.19-2.865-.313-.752-.63-.65-.869-.662-.225-.01-.483-.013-.74-.013-.258 0-.676.097-.1.03.484.45 1.543 1.51 1.543 3.68s1.575 4.27 1.8 4.565c.224.29 3.1 4.734 7.51 6.638 1.05.453 1.868.723 2.507.926.053.016.104.032.154.047 1.02.327 1.948.281 2.68.17.818-.124 2.28-.932 2.602-1.832.32-.9.32-1.673.225-1.832-.096-.16-.354-.257-.74-.45z"/>
+      </svg>
+      Place Order via WhatsApp
+    </button>
+
   </div>
-
 </section>
 
 <footer class="footer">
-  <p>Contact: +91 9876543210</p>
+  <p>© 2025 Diam Frames &nbsp;·&nbsp; Contact: +91 9876543210</p>
 </footer>
 
 <script src="script.js"></script>
