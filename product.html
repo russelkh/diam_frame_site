@@ -4,17 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product</title>
-
 <link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
 <header class="navbar">
   <a href="index.html" class="logo">
-    <img src="daim logo.PNG">
+    <img src="daim logo.PNG" alt="Logo">
   </a>
-
   <nav>
     <a href="cart.html" class="cart-link">
       🛒 Cart <span class="cart-count">0</span>
@@ -26,14 +25,16 @@
 
   <!-- IMAGE -->
   <div class="gallery">
-    <img id="product-img" class="main-img">
+    <img id="product-img" class="main-img" alt="Product Image">
   </div>
 
   <!-- DETAILS -->
   <div class="details">
     <h1 id="product-name"></h1>
+    <h2 id="product-price" style="color:#C8A96B; margin: 10px 0 8px;"></h2>
+    <div id="stock-badge"></div>
 
-    <label>Size</label>
+    <label style="margin-top:16px;">Size</label>
     <select id="size">
       <option>A4</option>
       <option>A3</option>
@@ -42,10 +43,8 @@
     <label>Quantity</label>
     <input type="number" id="qty" value="1" min="1">
 
-    <h2 id="product-price"></h2>
-
-    <button onclick="addToCart()" class="btn">Add to Cart</button>
-    <button onclick="buyNow()" class="btn-outline">Buy Now</button>
+    <button onclick="addToCart()" class="btn">🛒 Add to Cart</button>
+    <button onclick="buyNow()" class="btn-outline">⚡ Buy Now</button>
   </div>
 
 </section>
