@@ -40,7 +40,7 @@ async function loadHomePage() {
     grid.innerHTML = "";
 
     if (!sizes || sizes.length === 0) {
-      grid.innerHTML = `<div class="empty-state">No sizes available right now 😔</div>`;
+      grid.innerHTML = `<div class="empty-state">No sizes available right now </div>`;
       return;
     }
 
@@ -115,7 +115,7 @@ async function loadDesignsPage() {
     grid.innerHTML = "";
 
     if (!designs || designs.length === 0) {
-      grid.innerHTML = `<div class="empty-state">No designs available for this size yet 😔</div>`;
+      grid.innerHTML = `<div class="empty-state">No designs available for this size yet </div>`;
       return;
     }
 
@@ -279,12 +279,12 @@ async function placeOrder() {
 
   // WhatsApp message
   const msg =
-`🖼️ *New Frame Order — Diam Frames*
+` *New Frame Order — Diam Frames*
 
 👤 *Name:* ${name}
 📞 *Phone:* ${phone}
 
-🛍️ *Order:*
+ *Order:*
 • Size: ${sizeLabel}
 • Design: ${designName}
 • Price: ₹${price}
