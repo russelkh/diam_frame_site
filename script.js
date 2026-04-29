@@ -354,7 +354,7 @@ async function placeOrder() {
 • Price: ₹${price}
 ${addrLine ? `\n📍 *Address:* ${addrLine}` : ""}`;
 
-  window.location.href = `https://wa.me/919366518356?text=${encodeURIComponent(msg)}`;
+  window.location.href = `https://wa.me/919366208500?text=${encodeURIComponent(msg)}`;
 }
 
 // =========================
