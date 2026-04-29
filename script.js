@@ -4,6 +4,55 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwJzaCmRwlJE3h3vscx-5ACPl-e5cCKcU1D-y5u3Vza3ptVXpP_fvgRZ5--xLCYM73F/exec";
 
 // =========================
+// CACHE — stale-while-revalidate
+// Data shows instantly from cache, then silently refreshes in background
+// Cache expires after 10 minutes
+// =========================
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes in ms
+
+async function fetchWithCache(url, cacheKey) {
+  const now = Date.now();
+
+  // Try to read from cache
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      const age = now - timestamp;
+
+      if (age < CACHE_TTL) {
+        // Fresh cache — return immediately, no network call
+        return data;
+      } else {
+        // Stale cache — return it immediately for fast display,
+        // then fetch fresh data in background
+        fetchAndCache(url, cacheKey);
+        return data;
+      }
+    }
+  } catch (_) {}
+
+  // No cache — must fetch and wait
+  return await fetchAndCache(url, cacheKey);
+}
+
+async function fetchAndCache(url, cacheKey) {
+  const res  = await fetch(url);
+  const data = await res.json();
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch (_) {}
+  return data;
+}
+
+// Call this after owner updates the sheet to clear old cache
+function clearCache() {
+  Object.keys(localStorage)
+    .filter(k => k.startsWith("diam_"))
+    .forEach(k => localStorage.removeItem(k));
+}
+
+// =========================
 // TOAST
 // =========================
 function showToast(msg) {
@@ -34,8 +83,7 @@ async function loadHomePage() {
   `).join("");
 
   try {
-    const res = await fetch(`${API_URL}?action=sizes`);
-    const sizes = await res.json();
+    const sizes = await fetchWithCache(`${API_URL}?action=sizes`, "diam_sizes");
 
     grid.innerHTML = "";
 
@@ -45,16 +93,16 @@ async function loadHomePage() {
     }
 
     sizes.forEach(s => {
-      const img = s.image || `https://picsum.photos/seed/size${s.id}/600/400`;
+      const imgHtml = s.image
+        ? `<img src="${s.image}" loading="lazy" alt="${s.size_label}"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+           <div class="img-placeholder" style="display:none;">🖼️<span>${s.size_label}</span></div>`
+        : `<div class="img-placeholder">🖼️<span>${s.size_label}</span></div>`;
+
       grid.innerHTML += `
         <div class="size-card" onclick="goToDesigns(${s.id}, '${encodeURIComponent(s.size_label)}')">
           <div class="size-card-img-wrap">
-            <img
-              src="${img}"
-              loading="lazy"
-              alt="${s.size_label}"
-              onerror="this.src='https://picsum.photos/seed/size${s.id}/600/400'"
-            >
+            ${imgHtml}
           </div>
           <div class="size-card-body">
             <div class="size-card-info">
@@ -109,8 +157,7 @@ async function loadDesignsPage() {
   `).join("");
 
   try {
-    const res     = await fetch(`${API_URL}?action=designs&size_id=${sizeId}`);
-    const designs = await res.json();
+    const designs = await fetchWithCache(`${API_URL}?action=designs&size_id=${sizeId}`, `diam_designs_${sizeId}`);
 
     grid.innerHTML = "";
 
@@ -120,26 +167,28 @@ async function loadDesignsPage() {
     }
 
     designs.forEach(d => {
-      const img        = d.image || `https://picsum.photos/seed/d${d.id}/600/400`;
       const stockColor = d.stock <= 5 ? "#facc15" : "var(--muted)";
       const stockText  = d.stock <= 5 ? `Only ${d.stock} left!` : "In Stock";
+      const imgHtml    = d.image
+        ? `<img src="${d.image}" loading="lazy" alt="${d.design_name}"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+           <div class="img-placeholder" style="display:none;">🖼️<span>${d.design_name}</span></div>`
+        : `<div class="img-placeholder">🖼️<span>${d.design_name}</span></div>`;
+
+      // encode image URL for passing to product page
+      const imgParam = d.image ? encodeURIComponent(d.image) : "";
 
       grid.innerHTML += `
         <div class="design-card" onclick="goToProduct(
           '${encodeURIComponent(d.design_name)}',
-          '${encodeURIComponent(img)}',
+          '${imgParam}',
           ${d.price},
           '${encodeURIComponent(sizeLabel)}',
           ${d.stock},
           ${sizeId}
         )">
-          <div class="design-card-img-wrap">
-            <img
-              src="${img}"
-              loading="lazy"
-              alt="${d.design_name}"
-              onerror="this.src='https://picsum.photos/seed/d${d.id}/600/400'"
-            >
+          <div class="design-card-img-wrap" style="position:relative; height:200px; background:var(--surface2); overflow:hidden;">
+            ${imgHtml}
           </div>
           <div class="design-card-body">
             <p class="design-card-name">${d.design_name}</p>
@@ -212,10 +261,25 @@ function loadProductPage() {
   }
 
   // Image with skeleton fallback
-  imgEl.style.background = "var(--surface2)";
   imgEl.onload  = () => imgEl.style.background = "none";
-  imgEl.onerror = () => { imgEl.src = "https://picsum.photos/600/400"; };
-  imgEl.src = img;
+  imgEl.onerror = () => {
+    imgEl.style.display = "none";
+    const wrap = imgEl.parentElement;
+    wrap.style.background = "var(--surface2)";
+    wrap.style.minHeight = "300px";
+    wrap.style.display = "flex";
+    wrap.style.alignItems = "center";
+    wrap.style.justifyContent = "center";
+    wrap.style.flexDirection = "column";
+    wrap.style.gap = "10px";
+    wrap.style.color = "var(--muted)";
+    wrap.innerHTML = `<span style="font-size:3rem;">🖼️</span><span style="font-size:0.8rem;">${designName}</span>`;
+  };
+  if (img) {
+    imgEl.src = img;
+  } else {
+    imgEl.dispatchEvent(new Event("error"));
+  }
 
   // Store for order
   window.currentOrder = { designName, price, sizeLabel };
@@ -290,7 +354,7 @@ async function placeOrder() {
 • Price: ₹${price}
 ${addrLine ? `\n📍 *Address:* ${addrLine}` : ""}`;
 
-  window.location.href = `https://wa.me/919366518356?text=${encodeURIComponent(msg)}`;
+  window.location.href = `https://wa.me/919366349344?text=${encodeURIComponent(msg)}`;
 }
 
 // =========================

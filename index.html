@@ -6,6 +6,7 @@
   <title>Diam Frames</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -16,8 +17,7 @@
 </header>
 
 <section class="hero">
-  <p class="hero-eyebrow">Handcrafted in Manipur
-  </p>
+  <p class="hero-eyebrow">Handcrafted in Manipur</p>
   <h1>Frame Your Moments.<br><em>Forever.</em></h1>
   <p>Premium frames crafted for memories that deserve to last a lifetime.</p>
   <button class="hero-btn" onclick="document.getElementById('sizes').scrollIntoView({behavior:'smooth'})">
@@ -31,7 +31,7 @@
     <p>Pick a size to explore available designs</p>
     <div class="gold-line"></div>
   </div>
-  <div class="sizes-grid" id="sizes-grid"></div>
+  <div class="sizes-scroll" id="sizes-grid"></div>
 </section>
 
 <section class="how">
@@ -42,22 +42,22 @@
   </div>
   <div class="how-grid">
     <div class="how-card">
-      <div class="how-icon"></div>
+      <div class="how-icon"><i data-lucide="ruler"></i></div>
       <h3>Pick Size</h3>
       <p>Choose the frame size you need</p>
     </div>
     <div class="how-card">
-      <div class="how-icon"></div>
+      <div class="how-icon"><i data-lucide="paintbrush"></i></div>
       <h3>Choose Design</h3>
       <p>Browse designs for that size</p>
     </div>
     <div class="how-card">
-      <div class="how-icon"></div>
+      <div class="how-icon"><i data-lucide="message-circle"></i></div>
       <h3>Order</h3>
       <p>Place order instantly via WhatsApp</p>
     </div>
     <div class="how-card">
-      <div class="how-icon"></div>
+      <div class="how-icon"><i data-lucide="package"></i></div>
       <h3>Delivered</h3>
       <p>Fast & safe to your door</p>
     </div>
@@ -87,5 +87,6 @@
 </footer>
 
 <script src="script.js"></script>
+<script>lucide.createIcons();</script>
 </body>
 </html>

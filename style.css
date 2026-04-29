@@ -159,17 +159,26 @@
      SIZES SECTION (HOME)
      ===================== */
   .sizes-section {
-    padding: 110px 40px 80px;
+    padding: 110px 0 80px;
     flex: 1;
   }
   
-  .sizes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-    max-width: 1100px;
-    margin: 0 auto;
+  .sizes-section .section-header {
+    padding: 0 40px;
   }
+  
+  /* DESKTOP — horizontal scroll row */
+  .sizes-scroll {
+    display: flex;
+    gap: 22px;
+    overflow-x: auto;
+    padding: 16px 40px 24px;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .sizes-scroll::-webkit-scrollbar { display: none; }
   
   /* SIZE CARD — fully clickable */
   .size-card {
@@ -181,6 +190,9 @@
     transition: transform 0.28s, box-shadow 0.28s, border-color 0.28s;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    width: 280px;
+    scroll-snap-align: start;
   }
   
   .size-card:hover {
@@ -191,23 +203,45 @@
   
   .size-card-img-wrap {
     overflow: hidden;
+    position: relative;
+    height: 180px;
+    background: var(--surface2);
   }
   
-  .size-card img {
+  .size-card-img-wrap img {
     width: 100%;
-    height: 220px;
+    height: 100%;
     object-fit: cover;
     display: block;
-    background: var(--surface2);
     transition: transform 0.4s;
   }
   
-  .size-card:hover img {
+  .size-card:hover .size-card-img-wrap img {
     transform: scale(1.05);
   }
   
+  /* placeholder when no image */
+  .img-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 2rem;
+  }
+  
+  .img-placeholder span {
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  
   .size-card-body {
-    padding: 20px;
+    padding: 18px 20px 22px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -216,19 +250,21 @@
   
   .size-card-info h3 {
     font-family: var(--font-display);
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
   
   .size-card-info p {
     font-size: 0.82rem;
-    color: var(--muted);
+    color: var(--gold-light);
+    opacity: 0.85;
+    line-height: 1.4;
   }
   
   .size-card-arrow {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     border: 1px solid rgba(200,169,107,0.4);
     display: flex;
@@ -537,7 +573,30 @@
     border-color: rgba(200,169,107,0.2);
     box-shadow: 0 12px 32px rgba(0,0,0,0.4);
   }
-  .how-icon { font-size: 1.7rem; margin-bottom: 10px; }
+  .how-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(200,169,107,0.1);
+    border: 1px solid rgba(200,169,107,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  
+  .how-card:hover .how-icon {
+    background: rgba(200,169,107,0.18);
+    border-color: rgba(200,169,107,0.45);
+  }
+  
+  .how-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--gold);
+    stroke-width: 1.75;
+  }
   .how-card h3 {
     font-family: var(--font-display);
     font-size: 0.95rem;
@@ -666,15 +725,26 @@
     .navbar { padding: 12px 20px; }
     .logo img { width: 82px; }
   
-    .sizes-section { padding: 88px 16px 60px; }
-    .sizes-grid {
+    .sizes-section { padding: 88px 0 60px; }
+    .sizes-section .section-header { padding: 0 16px; }
+    .sizes-scroll {
+      display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      gap: 12px;
+      padding: 16px 16px 24px;
+      overflow-x: unset;
+      scroll-snap-type: unset;
     }
-    .size-card img { height: 150px; }
-    .size-card-body { padding: 14px; }
-    .size-card-info h3 { font-size: 1.05rem; }
-    .size-card-info p { display: none; }
+    .size-card {
+      width: 100%;
+      flex-shrink: unset;
+      scroll-snap-align: unset;
+    }
+    .size-card-img-wrap { height: 130px; }
+    .size-card-body { padding: 12px 14px 14px; }
+    .size-card-info h3 { font-size: 0.92rem; margin-bottom: 3px; }
+    .size-card-info p { font-size: 0.72rem; }
+    .size-card-arrow { width: 28px; height: 28px; font-size: 0.8rem; }
   
     .page-header { padding: 88px 20px 20px; }
     .designs-section { padding: 10px 16px 60px; }
@@ -703,7 +773,7 @@
     .video-section { padding: 60px 16px; }
   }
   
-  @media (max-width: 400px) {
-    .sizes-grid   { grid-template-columns: 1fr; }
-    .designs-grid { grid-template-columns: 1fr; }
+  @media (max-width: 360px) {
+    .sizes-scroll  { grid-template-columns: 1fr; }
+    .designs-grid  { grid-template-columns: 1fr; }
   }
