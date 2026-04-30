@@ -1,4 +1,4 @@
-# 🖼️ Diam Frames — Project README
+# Diam Frames — Project README
 
 A lightweight, mobile-friendly frame shop catalogue website. Customers browse frame sizes, choose a design, and place orders directly via WhatsApp. Stock and products are managed entirely from a Google Spreadsheet.
 
@@ -31,7 +31,7 @@ Product Page (fill name + phone → order via WhatsApp)
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Thing | What it is |
 |---|---|
@@ -43,7 +43,7 @@ Product Page (fill name + phone → order via WhatsApp)
 
 ---
 
-## 🔤 Fonts (Google Fonts)
+##  Fonts (Google Fonts)
 
 | Font | Usage | Weights |
 |---|---|---|
@@ -57,7 +57,7 @@ https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;
 
 ---
 
-## 🎨 Icons (Lucide Icons)
+##  Icons (Lucide Icons)
 
 Loaded via CDN:
 ```
@@ -85,7 +85,7 @@ Usage in HTML:
 
 ---
 
-## 🎨 Color Palette (CSS Variables)
+##  Color Palette (CSS Variables)
 
 | Variable | Value | Usage |
 |---|---|---|
@@ -101,7 +101,7 @@ Usage in HTML:
 
 ---
 
-## 🗄️ Google Spreadsheet Structure
+##  Google Spreadsheet Structure
 
 Spreadsheet name: **Diam Frames DB**
 
@@ -152,7 +152,7 @@ POST to same URL saves an order to the Orders sheet.
 
 ---
 
-## 🗃️ Caching
+## Caching
 
 Data is cached in `localStorage` with a **10 minute TTL** using a stale-while-revalidate strategy:
 
@@ -172,7 +172,7 @@ clearCache()
 
 ---
 
-## 📋 Order Form (Product Page)
+## Order Form (Product Page)
 
 | Field | Required | Validation |
 |---|---|---|
@@ -184,7 +184,7 @@ clearCache()
 
 ---
 
-## 📱 Responsive Layout
+##  Responsive Layout
 
 | Breakpoint | Layout |
 |---|---|
@@ -194,7 +194,7 @@ clearCache()
 
 ---
 
-## 🖼️ Images
+##  Images
 
 - **Hero background** — `https://picsum.photos/seed/diamframes/1600/900?grayscale` (permanent, same image every load)
 - **Size & Design cards** — owner adds Google Drive image URLs to the spreadsheet
@@ -202,7 +202,7 @@ clearCache()
 
 ---
 
-## 📲 WhatsApp Order
+##  WhatsApp Order
 
 Orders are sent to the owner's WhatsApp number. To change the number, find this line in `script.js`:
 
@@ -214,7 +214,8 @@ Replace `91XXXXXXXXXX` with `91` + owner's 10-digit number.
 
 ---
 
-## 🔧 How Owner Manages Stock
+
+## How Owner Manages Stock
 
 | Action | How |
 |---|---|
@@ -228,7 +229,7 @@ No code changes ever needed for day-to-day management. Everything is driven by t
 
 ---
 
-## 🚀 Deployment Checklist
+##  Deployment Checklist
 
 - [ ] Paste `google_apps_script.js` into Google Apps Script
 - [ ] Deploy as Web App (Execute as: Me, Access: Anyone)
