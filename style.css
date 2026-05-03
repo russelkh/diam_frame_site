@@ -56,7 +56,7 @@ body {
 
 .owner-name {
   font-family: var(--font-cursive);
-  font-size: 1.8rem;
+  font-size: 1.2rem;
   color: var(--gold);
   opacity: 0.88;
   letter-spacing: 0.01em;
