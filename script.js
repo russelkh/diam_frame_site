@@ -1,7 +1,13 @@
 // =========================
 // API — replace with your deployed Apps Script URL
 // =========================
-const API_URL = "https://script.google.com/macros/s/AKfycbwJzaCmRwlJE3h3vscx-5ACPl-e5cCKcU1D-y5u3Vza3ptVXpP_fvgRZ5--xLCYM73F/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzTlShoK-zC9YQG5Bl3tcfbIkydMiMfNEpG7OLqK_yW9QQBXZkQndkwj05YkLjaunZamA/exec";
+
+// =========================
+// SECRET TOKEN
+// Change this to any word/phrase you want — must match the one in Apps Script
+// =========================
+const SECRET = "diam104secret";
 
 // =========================
 // CACHE — stale-while-revalidate
@@ -83,12 +89,12 @@ async function loadHomePage() {
   `).join("");
 
   try {
-    const sizes = await fetchWithCache(`${API_URL}?action=sizes`, "diam_sizes");
+    const sizes = await fetchWithCache(`${API_URL}?action=sizes&token=${SECRET}`, "diam_sizes");
 
     grid.innerHTML = "";
 
     if (!sizes || sizes.length === 0) {
-      grid.innerHTML = `<div class="empty-state">No sizes available right now </div>`;
+      grid.innerHTML = `<div class="empty-state">No sizes available right now 😔</div>`;
       return;
     }
 
@@ -157,12 +163,12 @@ async function loadDesignsPage() {
   `).join("");
 
   try {
-    const designs = await fetchWithCache(`${API_URL}?action=designs&size_id=${sizeId}`, `diam_designs_${sizeId}`);
+    const designs = await fetchWithCache(`${API_URL}?action=designs&size_id=${sizeId}&token=${SECRET}`, `diam_designs_${sizeId}`);
 
     grid.innerHTML = "";
 
     if (!designs || designs.length === 0) {
-      grid.innerHTML = `<div class="empty-state">No designs available for this size yet </div>`;
+      grid.innerHTML = `<div class="empty-state">No designs available for this size yet 😔</div>`;
       return;
     }
 
@@ -332,6 +338,7 @@ async function placeOrder() {
     fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
+        token: SECRET,
         name, phone,
         size:    sizeLabel,
         design:  designName,
@@ -343,18 +350,17 @@ async function placeOrder() {
 
   // WhatsApp message
   const msg =
-` *New Frame Order — Diam Frames*
+`🖼 *NEW ORDER — DIAM FRAMES*
+―――――――――――――――――
+*Name:* ${name}
+*Phone:* ${phone}
+―――――――――――――――――
+*Size:* ${sizeLabel}
+*Design:* ${designName}
+*Price:* ₹${price}
+―――――――――――――――――${addrLine ? `\n*Address:* ${addrLine}\n―――――――――――――――――` : ""}`;
 
-👤 *Name:* ${name}
-📞 *Phone:* ${phone}
-
- *Order:*
-• Size: ${sizeLabel}
-• Design: ${designName}
-• Price: ₹${price}
-${addrLine ? `\n📍 *Address:* ${addrLine}` : ""}`;
-
-  window.location.href = `https://wa.me/919366208500?text=${encodeURIComponent(msg)}`;
+  window.location.href = `https://wa.me/919366349344?text=${encodeURIComponent(msg)}`;
 }
 
 // =========================
